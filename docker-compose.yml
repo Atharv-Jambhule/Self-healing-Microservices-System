@@ -4,24 +4,42 @@ services:
     image: postgres:15
     container_name: postgres-db
     restart: always
-    env_file:
-      - .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: self_healing_db
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
 
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     restart: always
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "9090:9090"
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
@@ -30,20 +48,7 @@ services:
     container_name: grafana
     restart: always
     ports:
-      - "${GRAFANA_PORT}:3000"
-    depends_on:
-      - prometheus
-
-  auth-service:
-    build: ./services/auth-service
-    container_name: auth-service
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - "${AUTH_SERVICE_PORT}:3001"
-    depends_on:
-      - postgres
+      - "3006:3000"
 
 volumes:
   postgres-data:
