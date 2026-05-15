@@ -34,6 +34,15 @@ services:
     env_file:
       - .env
 
+  order-service:
+    build: ./services/order-service
+    container_name: order-service
+    restart: always
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env
+
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway

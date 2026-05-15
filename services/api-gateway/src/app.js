@@ -39,6 +39,17 @@ app.use(
   })
 );
 
+app.use(
+  "/api/orders",
+  createProxyMiddleware({
+    target: "http://order-service:3003",
+    changeOrigin: true,
+    pathRewrite: {
+      "^/api/orders": "",
+    },
+  })
+);
+
 app.get("/metrics", async (req, res) => {
   res.set(
     "Content-Type",
