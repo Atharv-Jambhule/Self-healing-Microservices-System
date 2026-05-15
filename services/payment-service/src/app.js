@@ -22,6 +22,14 @@ promClient.collectDefaultMetrics();
 
 app.use("/", paymentRoutes);
 
+app.get("/health", (req, res) => {
+
+  res.status(200).json({
+    service: "payment-service",
+    status: "healthy",
+  });
+});
+
 app.get("/metrics", async (req, res) => {
 
   res.set(

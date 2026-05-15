@@ -16,9 +16,18 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 
+
 promClient.collectDefaultMetrics();
 
 app.use("/", orderRoutes);
+
+app.get("/health", (req, res) => {
+
+  res.status(200).json({
+    service: "order-service",
+    status: "healthy",
+  });
+});
 
 app.get("/metrics", async (req, res) => {
 

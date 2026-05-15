@@ -42,6 +42,11 @@ services:
       - "3003:3003"
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   payment-service:
     build: ./services/payment-service
@@ -51,7 +56,12 @@ services:
       - "3004:3004"
     env_file:
       - .env
-      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway
