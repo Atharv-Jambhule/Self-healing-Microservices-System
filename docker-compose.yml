@@ -43,6 +43,15 @@ services:
     env_file:
       - .env
 
+  payment-service:
+    build: ./services/payment-service
+    container_name: payment-service
+    restart: always
+    ports:
+      - "3004:3004"
+    env_file:
+      - .env
+      
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway

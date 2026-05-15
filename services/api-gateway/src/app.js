@@ -50,6 +50,17 @@ app.use(
   })
 );
 
+app.use(
+  "/api/payments",
+  createProxyMiddleware({
+    target: "http://payment-service:3004",
+    changeOrigin: true,
+    pathRewrite: {
+      "^/api/payments": "",
+    },
+  })
+);
+
 app.get("/metrics", async (req, res) => {
   res.set(
     "Content-Type",
