@@ -25,6 +25,15 @@ services:
     depends_on:
       - postgres
 
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env
+
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway
@@ -33,6 +42,7 @@ services:
       - "3000:3000"
     depends_on:
       - auth-service
+      - user-service
 
   prometheus:
     image: prom/prometheus
