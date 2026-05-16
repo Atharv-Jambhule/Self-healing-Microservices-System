@@ -1,18 +1,23 @@
-const { exec } = require("child_process");
+const Docker = require("dockerode");
 
 const logs = require("./data/logs");
 
-const restartedServices = {};
-const restartService = (serviceName) => {
+const docker = new Docker({
+  socketPath: "/var/run/docker.sock",
+});
+
+const cooldowns = {};
+
+const restartService = async (
+  serviceName
+) => {
 
   const now = Date.now();
 
-  const cooldown = 60000;
-
   if (
-    restartedServices[serviceName] &&
-    now - restartedServices[serviceName]
-      < cooldown
+    cooldowns[serviceName] &&
+    now - cooldowns[serviceName] <
+      30000
   ) {
 
     console.log(
@@ -22,42 +27,42 @@ const restartService = (serviceName) => {
     return;
   }
 
-  restartedServices[serviceName] = now;
+  cooldowns[serviceName] = now;
 
-  console.log(
-    `♻ Restarting ${serviceName}`
-  );
+  try {
 
-  exec(
-    `docker restart ${serviceName}`,
-    (error, stdout, stderr) => {
+    console.log(
+      `♻ Restarting ${serviceName}`
+    );
 
-      if (error) {
+    const container =
+      docker.getContainer(serviceName);
 
-        console.log(
-          `❌ Restart failed: ${serviceName}`
-        );
+    await container.restart();
 
-        logs.push({
-          timestamp: new Date(),
-          service: serviceName,
-          event: "Restart failed",
-        });
+    logs.push({
+      timestamp: new Date(),
+      service: serviceName,
+      event:
+        "Container restarted successfully",
+    });
 
-        return;
-      }
+    console.log(
+      `✔ ${serviceName} restarted`
+    );
 
-      console.log(
-        `✔ ${serviceName} restarted`
-      );
+  } catch (error) {
 
-      logs.push({
-        timestamp: new Date(),
-        service: serviceName,
-        event:
-          "Service restarted automatically",
-      });
-    }
-  );
+    logs.push({
+      timestamp: new Date(),
+      service: serviceName,
+      event: "Restart failed",
+    });
+
+    console.log(
+      `❌ Restart failed for ${serviceName}`
+    );
+  }
 };
+
 module.exports = restartService;

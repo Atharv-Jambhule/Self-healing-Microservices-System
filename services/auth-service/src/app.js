@@ -26,10 +26,16 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/", authRoutes);
 app.get("/metrics", async (req, res) => {
-  res.set("Content-Type", promClient.register.contentType);
-  res.end(await promClient.register.metrics());
+
+  res.set(
+    "Content-Type",
+    promClient.register.contentType
+  );
+
+  res.end(
+    await promClient.register.metrics()
+  );
 });
 
 const PORT = process.env.AUTH_SERVICE_PORT || 3001;

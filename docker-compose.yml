@@ -64,12 +64,23 @@ services:
 
   monitoring-server:
     build: ./services/monitoring-server
+
     container_name: monitoring-server
-    restart: always
+
     ports:
       - "5001:5001"
-    env_file:
-      - .env
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+
+    depends_on:
+      - auth-service
+      - user-service
+      - order-service
+      - payment-service
 
   api-gateway:
     build: ./services/api-gateway
@@ -92,10 +103,19 @@ services:
 
   grafana:
     image: grafana/grafana
-    container_name: grafana
-    restart: always
-    ports:
-      - "3006:3000"
 
+    container_name: grafana
+
+    ports:
+    - "3006:3000"
+
+    environment:
+    - GF_SECURITY_ALLOW_EMBEDDING=true
+
+    volumes:
+    - grafana-storage:/var/lib/grafana
+
+    
 volumes:
   postgres-data:
+  grafana-storage:

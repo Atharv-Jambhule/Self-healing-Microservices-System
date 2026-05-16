@@ -110,6 +110,7 @@ function App() {
           borderRadius: "12px",
           maxHeight: "400px",
           overflowY: "scroll",
+          marginBottom: "40px",
         }}
       >
 
@@ -143,6 +144,30 @@ function App() {
 
             </div>
         ))}
+      </div>
+
+      <div
+        style={{
+          marginTop: "40px",
+        }}
+      >
+
+        <h2>
+          📈 Live Infrastructure Analytics
+        </h2>
+
+        <iframe
+          src="http://localhost:3006/public-dashboards/91eab9c5fe7f4d2b811e80b9b7299316"
+          width="100%"
+          height="900px"
+          frameBorder="0"
+          title="Grafana Dashboard"
+          style={{
+            borderRadius: "12px",
+            background: "white",
+          }}
+        ></iframe>
+
       </div>
 
     </div>

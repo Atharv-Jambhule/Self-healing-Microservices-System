@@ -16,10 +16,14 @@ app.use(cors());
 
 app.use(express.json());
 
+// Status API
+
 app.get(
   "/status",
   checkServices
 );
+
+// Trigger anomaly detection every 10 sec
 
 setInterval(() => {
 

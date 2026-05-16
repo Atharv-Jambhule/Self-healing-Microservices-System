@@ -1,47 +1,77 @@
+const axios = require("axios");
+
 const logs = require("./data/logs");
 
 const restartService = require(
   "./selfHealingEngine"
 );
 
-let count = 0;
-
 const detectAnomalies = async () => {
 
-  console.log(
-    "🚀 anomaly detector triggered"
-  );
-
-  count++;
-
-  if (count >= 3) {
-
-    logs.push({
-      timestamp: new Date(),
-      service: "auth-service",
-      event:
-        "High memory anomaly detected",
-    });
+  try {
 
     console.log(
-      "⚠ High memory anomaly detected"
+      "🤖 ML anomaly detection running"
     );
 
-    restartService("auth-service");
+    const mlResponse =
+      await axios.post(
+        "http://host.docker.internal:6000/predict",
+        {
+          cpu: 95,
+          memory: 500,
+          requests: 800,
+          response_time: 1500,
+          restarts: 5
+        }
+      );
 
-    logs.push({
-      timestamp: new Date(),
-      service: "auth-service",
-      event:
-        "Self-healing restart triggered",
-    });
+    if (mlResponse.data.anomaly) {
 
-    console.log(
-      "♻ Self-healing restart triggered"
+      const services = [
+        "auth-service",
+        "user-service",
+        "order-service",
+        "payment-service"
+      ];
+
+      const randomIndex =
+        Math.floor(
+          Math.random() *
+          services.length
+        );
+
+      const serviceName =
+        services[randomIndex];
+
+      const logEntry = {
+        timestamp: new Date(),
+        service: serviceName,
+        event: "🤖 ML anomaly detected"
+      };
+
+      logs.unshift(logEntry);
+
+      if (logs.length > 50) {
+        logs.pop();
+      }
+
+      console.log(
+        "📋 Added log:",
+        logEntry
+      );
+
+      restartService(serviceName);
+    }
+
+  } catch (error) {
+
+    console.error(
+      "ML Detection Error:",
+      error.message
     );
-
-    count = 0;
   }
 };
 
-module.exports = detectAnomalies;
+module.exports =
+  detectAnomalies;
