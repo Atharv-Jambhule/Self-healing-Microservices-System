@@ -16,7 +16,6 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 
-
 promClient.collectDefaultMetrics();
 
 app.use("/", orderRoutes);
@@ -36,13 +35,16 @@ app.get("/metrics", async (req, res) => {
     promClient.register.contentType
   );
 
-  res.end(await promClient.register.metrics());
+  res.end(
+    await promClient.register.metrics()
+  );
 });
 
 const PORT =
   process.env.ORDER_SERVICE_PORT || 3003;
 
 app.listen(PORT, () => {
+
   console.log(
     `🚀 Order Service running on port ${PORT}`
   );

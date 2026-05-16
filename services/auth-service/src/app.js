@@ -17,8 +17,16 @@ app.use(morgan("dev"));
 
 promClient.collectDefaultMetrics();
 
-app.use("/api/auth", authRoutes);
 
+app.get("/health", (req, res) => {
+  
+  res.status(200).json({
+    service: "auth-service",
+    status: "healthy",
+  });
+});
+
+app.use("/", authRoutes);
 app.get("/metrics", async (req, res) => {
   res.set("Content-Type", promClient.register.contentType);
   res.end(await promClient.register.metrics());

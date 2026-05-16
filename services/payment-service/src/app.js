@@ -37,13 +37,16 @@ app.get("/metrics", async (req, res) => {
     promClient.register.contentType
   );
 
-  res.end(await promClient.register.metrics());
+  res.end(
+    await promClient.register.metrics()
+  );
 });
 
 const PORT =
   process.env.PAYMENT_SERVICE_PORT || 3004;
 
 app.listen(PORT, () => {
+
   console.log(
     `🚀 Payment Service running on port ${PORT}`
   );

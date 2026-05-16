@@ -62,6 +62,15 @@ services:
       timeout: 5s
       retries: 3
 
+  monitoring-server:
+    build: ./services/monitoring-server
+    container_name: monitoring-server
+    restart: always
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway

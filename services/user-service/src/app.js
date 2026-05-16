@@ -20,19 +20,31 @@ promClient.collectDefaultMetrics();
 
 app.use("/", userRoutes);
 
+app.get("/health", (req, res) => {
+
+  res.status(200).json({
+    service: "user-service",
+    status: "healthy",
+  });
+});
+
 app.get("/metrics", async (req, res) => {
+
   res.set(
     "Content-Type",
     promClient.register.contentType
   );
 
-  res.end(await promClient.register.metrics());
+  res.end(
+    await promClient.register.metrics()
+  );
 });
 
 const PORT =
   process.env.USER_SERVICE_PORT || 3002;
 
 app.listen(PORT, () => {
+
   console.log(
     `🚀 User Service running on port ${PORT}`
   );
